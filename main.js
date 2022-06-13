@@ -4,6 +4,9 @@
 const { app, BrowserWindow, ipcMain } = require('electron')
 const path = require('path')
 
+let MainWindow = null
+let OpenWindows = []
+
 const createWindow = () => {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
@@ -17,8 +20,11 @@ const createWindow = () => {
     }
   })
 
+  MainWindow = mainWindow
+
   // and load the index.html of the app.
-  mainWindow.loadURL('https://slack-windowing.web.app/')
+  mainWindow.loadURL('http://localhost:8080/')
+  OpenWindows['main-window'] = MainWindow
 
   // Open the DevTools.
   // mainWindow.webContents.openDevTools()
@@ -52,20 +58,35 @@ ipcMain.on('create-new-window', (event, arg) => {
   createNewWindow(arg);
 })
 
+ipcMain.on('close-window', (event, args) => {
+  const chatId = args.chatId
+  OpenWindows[chatId].close()
+})
+
 const createNewWindow = (args) => {
+  const sidebarSize = 335
+  const appHeaderSize = 44
+  const position = MainWindow.getPosition()
+  const size = MainWindow.getSize()
+  const offset = 12
+
   // Create the browser window.
   const win = new BrowserWindow({
-    width: 1024,
-    height: 768,
+    width: size[0] - sidebarSize,
+    height: size[1] - appHeaderSize,
+    x: position[0] + sidebarSize + offset,
+    y: position[1] + appHeaderSize + offset,
     frame: false,
     autoHideMenuBar: true,
+    parent: MainWindow,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js')
     },
   })
 
   // and load the index.html of the app.
-  win.loadURL(`https://slack-windowing.web.app/${args}/popout`)
+  win.loadURL(`http://localhost:8080/${args.chatId}/${args.threadId || ''}?popout=true`)
+  OpenWindows[args.chatId] = win
 
   // Open the DevTools.
   // mainWindow.webContents.openDevTools()
