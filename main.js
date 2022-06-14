@@ -6,6 +6,7 @@ const path = require('path')
 
 let MainWindow = null
 let OpenWindows = []
+const host = `https://slack-windowing.web.app`
 
 const createWindow = () => {
   // Create the browser window.
@@ -13,6 +14,8 @@ const createWindow = () => {
     width: 1024,
     height: 768,
     frame: false,
+    titleBarStyle: 'hidden',
+    trafficLightPosition: { x: 15, y: 13 },
     autoHideMenuBar: true,
     webPreferences: {
       nodeIntegration: true,
@@ -23,7 +26,7 @@ const createWindow = () => {
   MainWindow = mainWindow
 
   // and load the index.html of the app.
-  mainWindow.loadURL('http://localhost:8080/')
+  mainWindow.loadURL(host)
   OpenWindows['main-window'] = MainWindow
 
   // Open the DevTools.
@@ -71,22 +74,20 @@ const createNewWindow = (args) => {
   const offset = 12
 
   // Create the browser window.
-  const win = new BrowserWindow({
+  new BrowserWindow({
     width: size[0] - sidebarSize,
     height: size[1] - appHeaderSize,
     x: position[0] + sidebarSize + offset,
     y: position[1] + appHeaderSize + offset,
     frame: false,
+    titleBarStyle: 'hidden',
+    trafficLightPosition: { x: 15, y: 13 },
     autoHideMenuBar: true,
-    parent: MainWindow,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js')
     },
-  })
-
-  // and load the index.html of the app.
-  win.loadURL(`http://localhost:8080/${args.chatId}/${args.threadId || ''}?popout=true`)
-  OpenWindows[args.chatId] = win
+  }).loadURL(`${host}/${args.chatId}/${args.threadId || ''}?popout=true`)
+  // OpenWindows[args.chatId] = win
 
   // Open the DevTools.
   // mainWindow.webContents.openDevTools()

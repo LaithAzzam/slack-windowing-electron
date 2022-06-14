@@ -1,7 +1,7 @@
 {
-  "name": "my-electron-app",
-  "version": "1.0.0",
-  "description": "Slack Windowing Prototype",
+  "name": "slack-windowing-proto",
+  "version": "1.0.1",
+  "description": "Electron wrapper for slack windowing prototype",
   "author": "Laith Azzam",
   "main": "main.js",
   "scripts": {
